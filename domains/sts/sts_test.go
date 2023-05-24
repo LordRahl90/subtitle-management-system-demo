@@ -23,13 +23,13 @@ var (
 func TestMain(m *testing.M) {
 	code := 1
 	defer func() {
-		if err := db.Exec("DELETE FROM contents").Error; err != nil {
-			log.Fatal(err)
-		}
+		// if err := db.Exec("DELETE FROM contents").Error; err != nil {
+		// 	log.Fatal(err)
+		// }
 
-		if err := db.Exec("DELETE FROM subtitles").Error; err != nil {
-			log.Fatal(err)
-		}
+		// if err := db.Exec("DELETE FROM subtitles").Error; err != nil {
+		// 	log.Fatal(err)
+		// }
 		os.Exit(code)
 	}()
 	db, initError = setupTestDB()
@@ -150,9 +150,9 @@ func setupTestDB() (*gorm.DB, error) {
 	if env == "cicd" {
 		dsn = "test_user:password@tcp(127.0.0.1:33306)/translations?charset=utf8mb4&parseTime=True&loc=Local"
 	}
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	dd, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
-	return db, err
+	return dd, err
 }
