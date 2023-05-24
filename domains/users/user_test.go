@@ -14,7 +14,10 @@ import (
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
+var (
+	db        *gorm.DB
+	initError error
+)
 
 func TestMain(m *testing.M) {
 	code := 1
@@ -22,7 +25,10 @@ func TestMain(m *testing.M) {
 		cleanup()
 		os.Exit(code)
 	}()
-	db = setupTestDB()
+	db, initError = setupTestDB()
+	if initError != nil {
+		log.Fatal(initError)
+	}
 	code = m.Run()
 }
 
