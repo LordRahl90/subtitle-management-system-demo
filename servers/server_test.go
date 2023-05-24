@@ -2,6 +2,7 @@ package servers
 
 import (
 	"bytes"
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -65,15 +66,14 @@ func setupTestDB() (*gorm.DB, error) {
 	// if err != nil {
 	// 	panic(err)
 	// }
-	db, err := gorm.Open(mysql.New(mysql.Config{
-		DSN:                       dsn,   // data source name
-		DefaultStringSize:         256,   // default size for string fields
-		DisableDatetimePrecision:  true,  // disable datetime precision, which not supported before MySQL 5.6
-		DontSupportRenameIndex:    true,  // drop & create when rename index, rename index not supported before MySQL 5.7, MariaDB
-		DontSupportRenameColumn:   true,  // `change` when rename column, rename column not supported before MySQL 8, MariaDB
-		SkipInitializeWithVersion: false, // auto configure based on currently MySQL version
+	sqlDB, err := sql.Open("mysql", dsn)
+	if err != nil {
+		panic(err)
+	}
+	gormDB, err := gorm.Open(mysql.New(mysql.Config{
+		Conn: sqlDB,
 	}), &gorm.Config{})
-	return db, err
+	return gormDB, err
 }
 
 func cleanup() {
