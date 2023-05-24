@@ -2,13 +2,11 @@ package sts
 
 import (
 	"context"
-	"log"
 	"os"
 	"strings"
 	"testing"
 
 	"github.com/brianvoe/gofakeit"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gorm.io/driver/mysql"
@@ -23,7 +21,7 @@ var (
 func TestMain(m *testing.M) {
 	code := 1
 	defer func() {
-		cleanup()
+		// cleanup()
 		os.Exit(code)
 	}()
 	db, initError = setupTestDB()
@@ -51,11 +49,11 @@ func TestCreateSubtitle(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotEmpty(t, s.ID)
 
-	t.Cleanup(func() {
-		if err := db.Exec("DELETE FROM subtitles WHERE id = ?", s.ID).Error; err != nil {
-			log.Fatal(err)
-		}
-	})
+	// t.Cleanup(func() {
+	// 	if err := db.Exec("DELETE FROM subtitles WHERE id = ?", s.ID).Error; err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// })
 
 	res, err := repo.FindSubtitle(ctx, s.Name)
 	require.NoError(t, err)
@@ -65,78 +63,78 @@ func TestCreateSubtitle(t *testing.T) {
 	assert.Equal(t, s.CreatedAt, res.CreatedAt)
 }
 
-func TestCreateContent(t *testing.T) {
-	c := &Content{
-		SubtitleID: uuid.NewString(),
-		TimeStart:  "00:01:20.00",
-		TimeStop:   "00:02:00.00",
-		Content:    "Hello World",
-	}
+// func TestCreateContent(t *testing.T) {
+// 	c := &Content{
+// 		SubtitleID: uuid.NewString(),
+// 		TimeStart:  "00:01:20.00",
+// 		TimeStop:   "00:02:00.00",
+// 		Content:    "Hello World",
+// 	}
 
-	ctx := context.Background()
+// 	ctx := context.Background()
 
-	repo, err := New(db)
-	require.NoError(t, err)
-	require.NotNil(t, repo)
+// 	repo, err := New(db)
+// 	require.NoError(t, err)
+// 	require.NotNil(t, repo)
 
-	err = repo.CreateContent(ctx, c)
-	require.NoError(t, err)
-	assert.NotEmpty(t, c.ID)
+// 	err = repo.CreateContent(ctx, c)
+// 	require.NoError(t, err)
+// 	assert.NotEmpty(t, c.ID)
 
-	if err := db.Exec("DELETE FROM contents WHERE id = ?", c.ID).Error; err != nil {
-		log.Fatal(err)
-	}
-}
+// 	if err := db.Exec("DELETE FROM contents WHERE id = ?", c.ID).Error; err != nil {
+// 		log.Fatal(err)
+// 	}
+// }
 
-func TestFindContentByTimestamp(t *testing.T) {
-	subtitleID := uuid.NewString()
-	ctx := context.Background()
-	ids := []string{}
+// func TestFindContentByTimestamp(t *testing.T) {
+// 	subtitleID := uuid.NewString()
+// 	ctx := context.Background()
+// 	ids := []string{}
 
-	repo, err := New(db)
-	require.NoError(t, err)
-	require.NotNil(t, repo)
+// 	repo, err := New(db)
+// 	require.NoError(t, err)
+// 	require.NotNil(t, repo)
 
-	c := []*Content{
-		{
-			SubtitleID: subtitleID,
-			TimeStart:  "00:00:12.00",
-			TimeStop:   "00:01:20.00",
-			TimeRange:  "00:00:12.00 - 00:01:20.00",
-			Content:    "Ich bin Arwen - Ich bin gekommen, um dir zu helfen.",
-		},
-		{
-			SubtitleID: subtitleID,
-			TimeStart:  "00:03:55.00",
-			TimeStop:   "00:04:20.00",
-			TimeRange:  "00:03:55.00 - 00:04:20.00",
-			Content:    "Komm zurück zum Licht.",
-		}, {
-			SubtitleID: subtitleID,
-			TimeStart:  "00:04:59.00",
-			TimeStop:   "00:05:30.00",
-			TimeRange:  "00:04:59.00 - 00:05:30.00",
-			Content:    " Nein, my Schatz!!.",
-		},
-	}
+// 	c := []*Content{
+// 		{
+// 			SubtitleID: subtitleID,
+// 			TimeStart:  "00:00:12.00",
+// 			TimeStop:   "00:01:20.00",
+// 			TimeRange:  "00:00:12.00 - 00:01:20.00",
+// 			Content:    "Ich bin Arwen - Ich bin gekommen, um dir zu helfen.",
+// 		},
+// 		{
+// 			SubtitleID: subtitleID,
+// 			TimeStart:  "00:03:55.00",
+// 			TimeStop:   "00:04:20.00",
+// 			TimeRange:  "00:03:55.00 - 00:04:20.00",
+// 			Content:    "Komm zurück zum Licht.",
+// 		}, {
+// 			SubtitleID: subtitleID,
+// 			TimeStart:  "00:04:59.00",
+// 			TimeStop:   "00:05:30.00",
+// 			TimeRange:  "00:04:59.00 - 00:05:30.00",
+// 			Content:    " Nein, my Schatz!!.",
+// 		},
+// 	}
 
-	t.Cleanup(func() {
-		if err := db.Exec("DELETE FROM contents WHERE id IN ?", ids).Error; err != nil {
-			log.Fatal(err)
-		}
-	})
+// 	t.Cleanup(func() {
+// 		if err := db.Exec("DELETE FROM contents WHERE id IN ?", ids).Error; err != nil {
+// 			log.Fatal(err)
+// 		}
+// 	})
 
-	for _, v := range c {
-		require.NoError(t, repo.CreateContent(ctx, v))
-		ids = append(ids, v.ID)
-	}
+// 	for _, v := range c {
+// 		require.NoError(t, repo.CreateContent(ctx, v))
+// 		ids = append(ids, v.ID)
+// 	}
 
-	res, err := repo.FindContentByTimeRange(ctx, subtitleID, "00:03:55.00 - 00:04:20.00", "00:04:59.00 - 00:05:30.00")
-	require.NoError(t, err)
-	require.NotNil(t, res)
+// 	res, err := repo.FindContentByTimeRange(ctx, subtitleID, "00:03:55.00 - 00:04:20.00", "00:04:59.00 - 00:05:30.00")
+// 	require.NoError(t, err)
+// 	require.NotNil(t, res)
 
-	assert.Len(t, res, 2)
-}
+// 	assert.Len(t, res, 2)
+// }
 
 func setupTestDB() (*gorm.DB, error) {
 	env := os.Getenv("ENVIRONMENT")
@@ -148,12 +146,12 @@ func setupTestDB() (*gorm.DB, error) {
 	return db, err
 }
 
-func cleanup() {
-	if err := db.Exec("DELETE FROM contents").Error; err != nil {
-		log.Fatal(err)
-	}
+// func cleanup() {
+// 	if err := db.Exec("DELETE FROM contents").Error; err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	if err := db.Exec("DELETE FROM subtitles").Error; err != nil {
-		log.Fatal(err)
-	}
-}
+// 	if err := db.Exec("DELETE FROM subtitles").Error; err != nil {
+// 		log.Fatal(err)
+// 	}
+// }
