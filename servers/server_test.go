@@ -37,8 +37,13 @@ func TestMain(m *testing.M) {
 	}()
 	db, initErr = setupTestDB()
 	if initErr != nil {
-		log.Fatal(initErr)
+		panic(initErr)
+		// log.Fatal(initErr)
 	}
+	if db == nil {
+		panic("db failed to initialize")
+	}
+
 	s, err := New(db)
 	if err != nil {
 		log.Fatal(err)
