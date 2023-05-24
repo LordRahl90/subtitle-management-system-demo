@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"translations/domains/users"
+	"translations/services/sts"
 	"translations/services/tms"
 
 	"github.com/gin-gonic/gin"
@@ -16,6 +17,7 @@ type Server struct {
 	Router           *gin.Engine
 	userService      users.IUserService
 	translateService tms.Service
+	subtitleService  sts.Service
 	signingSecret    string
 }
 
@@ -31,17 +33,24 @@ func New(db *gorm.DB) (*Server, error) {
 		return nil, err
 	}
 
+	subtitleService, err := sts.NewWithDefault(db)
+	if err != nil {
+		return nil, err
+	}
+
 	s := &Server{
 		db:               db,
 		Router:           router,
 		userService:      userService,
 		translateService: translateService,
+		subtitleService:  subtitleService,
 	}
 
 	s.Router.POST("/login", s.authenticate)
 	s.Router.POST("/users/create", s.createUser)
 	s.Router.Use(s.authenticated())
 	s.tmsRoutes()
+	s.stsRoutes()
 
 	return s, nil
 }

@@ -8,7 +8,7 @@ import (
 type Subtitle struct {
 	ID             string `json:"id" gorm:"size:100;primaryKey"`
 	Name           string `json:"name" gorm:"size:100;uniqueIndex"`
-	Filename       string `json:"file_name"`
+	Filename       string `json:"file_name,omitempty"`
 	SourceLanguage string `json:"source_language"`
 	gorm.Model
 }

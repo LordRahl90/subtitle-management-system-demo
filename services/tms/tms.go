@@ -44,11 +44,11 @@ func (ts *TranslationService) Create(ctx context.Context, e *tms.Translation) er
 
 // Translate takes in the required data and translates it to the target language.
 // It returns the source string if the target isn't found
-func (ts *TranslationService) Translate(ctx context.Context, e *tms.Translation) (string, error) {
-	res, err := ts.translationRepo.Find(ctx, e.SourceLanguage, e.TargetLanguage, e.Source)
+func (ts *TranslationService) Translate(ctx context.Context, source, sourceLang, targetLang string) (string, error) {
+	res, err := ts.translationRepo.Find(ctx, sourceLang, targetLang, source)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return e.Source, nil
+			return source, nil
 		}
 		return "", err
 	}

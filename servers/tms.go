@@ -66,7 +66,7 @@ func (s *Server) translate(ctx *gin.Context) {
 		TargetLanguage: req.TargetLanguage,
 	}
 
-	res, err := s.translateService.Translate(ctx, e)
+	res, err := s.translateService.Translate(ctx, e.Source, e.SourceLanguage, e.TargetLanguage)
 	if err != nil {
 		internalError(ctx, err)
 		return

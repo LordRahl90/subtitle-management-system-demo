@@ -10,5 +10,5 @@ import (
 type Service interface {
 	Create(ctx context.Context, e *tms.Translation) error
 	Upload(ctx context.Context, file *multipart.FileHeader) error
-	Translate(ctx context.Context, e *tms.Translation) (string, error)
+	Translate(ctx context.Context, source, sourceLang, targetLang string) (string, error)
 }
