@@ -2,6 +2,7 @@ package sts
 
 import (
 	"context"
+	"log"
 	"os"
 	"strings"
 	"testing"
@@ -22,13 +23,7 @@ var (
 func TestMain(m *testing.M) {
 	code := 1
 	defer func() {
-		// if err := db.Exec("DELETE FROM contents").Error; err != nil {
-		// 	log.Fatal(err)
-		// }
-
-		// if err := db.Exec("DELETE FROM subtitles").Error; err != nil {
-		// 	log.Fatal(err)
-		// }
+		cleanup()
 		os.Exit(code)
 	}()
 	db, initError = setupTestDB()
@@ -56,12 +51,11 @@ func TestCreateSubtitle(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotEmpty(t, s.ID)
 
-	// t.Cleanup(func() {
-	// 	if err := db.Exec("DELETE FROM subtitles WHERE id = ?", s.ID).Error; err != nil {
-	// 		panic(err)
-	// 		// log.Fatal(err)
-	// 	}
-	// })
+	t.Cleanup(func() {
+		if err := db.Exec("DELETE FROM subtitles WHERE id = ?", s.ID).Error; err != nil {
+			log.Fatal(err)
+		}
+	})
 
 	res, err := repo.FindSubtitle(ctx, s.Name)
 	require.NoError(t, err)
@@ -89,10 +83,9 @@ func TestCreateContent(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotEmpty(t, c.ID)
 
-	// if err := db.Exec("DELETE FROM contents WHERE id = ?", c.ID).Error; err != nil {
-	// 	panic(err)
-	// 	// log.Fatal(err)
-	// }
+	if err := db.Exec("DELETE FROM contents WHERE id = ?", c.ID).Error; err != nil {
+		log.Fatal(err)
+	}
 }
 
 func TestFindContentByTimestamp(t *testing.T) {
@@ -127,11 +120,11 @@ func TestFindContentByTimestamp(t *testing.T) {
 		},
 	}
 
-	// t.Cleanup(func() {
-	// 	if err := db.Exec("DELETE FROM contents WHERE id IN ?", ids).Error; err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// })
+	t.Cleanup(func() {
+		if err := db.Exec("DELETE FROM contents WHERE id IN ?", ids).Error; err != nil {
+			log.Fatal(err)
+		}
+	})
 
 	for _, v := range c {
 		require.NoError(t, repo.CreateContent(ctx, v))
@@ -151,6 +144,16 @@ func setupTestDB() (*gorm.DB, error) {
 	if env == "cicd" {
 		dsn = "test_user:password@tcp(127.0.0.1:33306)/translations?charset=utf8mb4&parseTime=True&loc=Local"
 	}
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	return db, err
+}
 
-	return gorm.Open(mysql.Open(dsn), &gorm.Config{})
+func cleanup() {
+	if err := db.Exec("DELETE FROM contents").Error; err != nil {
+		log.Fatal(err)
+	}
+
+	if err := db.Exec("DELETE FROM subtitles").Error; err != nil {
+		log.Fatal(err)
+	}
 }
