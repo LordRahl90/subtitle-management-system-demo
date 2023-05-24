@@ -3,7 +3,6 @@ package servers
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -46,7 +45,8 @@ func TestMain(m *testing.M) {
 
 	s, err := New(db)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
+		//log.Fatal(err)
 	}
 	server = s
 	server.signingSecret = signingSecret
@@ -58,7 +58,6 @@ func setupTestDB() (*gorm.DB, error) {
 	dsn := "root:@tcp(127.0.0.1:3306)/translations?charset=utf8mb4&parseTime=True&loc=Local"
 	if env == "cicd" {
 		dsn = "test_user:password@tcp(127.0.0.1:33061)/translations?charset=utf8mb4&parseTime=True&loc=Local"
-		fmt.Printf("\n\nDSN: %s\n\n", dsn)
 	}
 	return gorm.Open(mysql.Open(dsn), &gorm.Config{})
 }
@@ -68,10 +67,12 @@ func cleanup() {
 		panic("DB is not initialized!!!")
 	}
 	if err := db.Exec("DELETE FROM users").Error; err != nil {
-		log.Fatal(err)
+		panic(err)
+		// log.Fatal(err)
 	}
 	if err := db.Exec("DELETE FROM translations").Error; err != nil {
-		log.Fatal(err)
+		panic(err)
+		// log.Fatal(err)
 	}
 }
 
