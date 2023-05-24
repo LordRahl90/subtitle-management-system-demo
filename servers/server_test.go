@@ -52,7 +52,7 @@ func setupTestDB() (*gorm.DB, error) {
 	env := os.Getenv("ENVIRONMENT")
 	dsn := "root:@tcp(127.0.0.1:3306)/translations?charset=utf8mb4&parseTime=True&loc=Local"
 	if env == "cicd" {
-		dsn = "test_user:password@tcp(127.0.0.1:33306)/translations?charset=utf8mb4&parseTime=True&loc=Local"
+		dsn = "test_user:password@tcp(127.0.0.1:33061)/translations?charset=utf8mb4&parseTime=True&loc=Local"
 		fmt.Printf("\n\nDSN: %s\n\n", dsn)
 	}
 	return gorm.Open(mysql.Open(dsn), &gorm.Config{})

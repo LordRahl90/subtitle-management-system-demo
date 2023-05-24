@@ -39,7 +39,7 @@ jobs:
           MYSQL_DATABASE: translations
           ENVIRONMENT: cicd
         ports:
-          - 33306:3306
+          - 33061:3306
     steps:
       - uses: actions/checkout@v3
 
