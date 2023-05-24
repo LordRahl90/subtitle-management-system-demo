@@ -29,6 +29,9 @@ func TestMain(m *testing.M) {
 		panic(initError)
 		// log.Fatal(initError)
 	}
+	if db == nil {
+		panic("DB is not well setup!!!")
+	}
 	code = m.Run()
 }
 
@@ -142,8 +145,7 @@ func setupTestDB() (*gorm.DB, error) {
 	if env == "cicd" {
 		dsn = "test_user:password@tcp(127.0.0.1:33306)/translations?charset=utf8mb4&parseTime=True&loc=Local"
 	}
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	return db, err
+	return gorm.Open(mysql.Open(dsn), &gorm.Config{})
 }
 
 // func cleanup() {
