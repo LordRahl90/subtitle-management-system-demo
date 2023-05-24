@@ -2,7 +2,6 @@ package sts
 
 import (
 	"context"
-	"log"
 	"os"
 	"strings"
 	"testing"
@@ -57,12 +56,12 @@ func TestCreateSubtitle(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotEmpty(t, s.ID)
 
-	t.Cleanup(func() {
-		if err := db.Exec("DELETE FROM subtitles WHERE id = ?", s.ID).Error; err != nil {
-			panic(err)
-			// log.Fatal(err)
-		}
-	})
+	// t.Cleanup(func() {
+	// 	if err := db.Exec("DELETE FROM subtitles WHERE id = ?", s.ID).Error; err != nil {
+	// 		panic(err)
+	// 		// log.Fatal(err)
+	// 	}
+	// })
 
 	res, err := repo.FindSubtitle(ctx, s.Name)
 	require.NoError(t, err)
@@ -90,10 +89,10 @@ func TestCreateContent(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotEmpty(t, c.ID)
 
-	if err := db.Exec("DELETE FROM contents WHERE id = ?", c.ID).Error; err != nil {
-		panic(err)
-		// log.Fatal(err)
-	}
+	// if err := db.Exec("DELETE FROM contents WHERE id = ?", c.ID).Error; err != nil {
+	// 	panic(err)
+	// 	// log.Fatal(err)
+	// }
 }
 
 func TestFindContentByTimestamp(t *testing.T) {
@@ -128,11 +127,11 @@ func TestFindContentByTimestamp(t *testing.T) {
 		},
 	}
 
-	t.Cleanup(func() {
-		if err := db.Exec("DELETE FROM contents WHERE id IN ?", ids).Error; err != nil {
-			log.Fatal(err)
-		}
-	})
+	// t.Cleanup(func() {
+	// 	if err := db.Exec("DELETE FROM contents WHERE id IN ?", ids).Error; err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// })
 
 	for _, v := range c {
 		require.NoError(t, repo.CreateContent(ctx, v))
