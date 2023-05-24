@@ -30,8 +30,8 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     services:
-      mysql:
-        image: mysql:latest
+      mysql_db:
+        image: mysql:5.7
         env:
           MYSQL_ROOT_PASSWORD: rootpassword
           MYSQL_USER: test_user
@@ -39,7 +39,7 @@ jobs:
           MYSQL_DATABASE: translations
           ENVIRONMENT: cicd
         ports:
-          - 33061:3306
+          - 33361:3306
     steps:
       - uses: actions/checkout@v3
 
