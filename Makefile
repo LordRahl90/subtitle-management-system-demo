@@ -7,4 +7,4 @@ test:
 test-with-race:
 	go test -race ./... --cover
 
-twr: test-race
+twr: test-with-race

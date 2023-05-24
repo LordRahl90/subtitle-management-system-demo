@@ -29,8 +29,7 @@ var (
 func TestMain(m *testing.M) {
 	var code = 1
 	defer func() {
-		// cleanup()
-		fmt.Printf("Hello done!!!")
+		cleanup()
 		os.Exit(code)
 	}()
 	db, initErr = setupTestDB()
@@ -48,9 +47,9 @@ func TestMain(m *testing.M) {
 
 func setupTestDB() (*gorm.DB, error) {
 	env := os.Getenv("ENVIRONMENT")
-	dsn := "root:@tcp(127.0.0.1:3306)/subscriptions?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:@tcp(127.0.0.1:3306)/translations?charset=utf8mb4&parseTime=True&loc=Local"
 	if env == "cicd" {
-		dsn = "test_user:password@tcp(127.0.0.1:33306)/subscriptions?charset=utf8mb4&parseTime=True&loc=Local"
+		dsn = "test_user:password@tcp(127.0.0.1:33306)/translations?charset=utf8mb4&parseTime=True&loc=Local"
 	}
 	return gorm.Open(mysql.Open(dsn), &gorm.Config{})
 }

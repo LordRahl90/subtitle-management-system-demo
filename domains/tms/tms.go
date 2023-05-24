@@ -52,6 +52,5 @@ func (tr *TranslationRepository) Update(ctx context.Context, e *Translation) err
 // Create saves a new translation content to the database
 func (tr *TranslationRepository) Create(ctx context.Context, e *Translation) error {
 	e.ID = uuid.NewString()
-	println(e.ID)
 	return tr.db.WithContext(ctx).Save(&e).Error
 }
