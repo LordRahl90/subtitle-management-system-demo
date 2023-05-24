@@ -4,7 +4,10 @@ package tms
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"io"
+	"mime/multipart"
 	"translations/domains/tms"
 
 	"gorm.io/gorm"
@@ -53,6 +56,38 @@ func (ts *TranslationService) Translate(ctx context.Context, e *tms.Translation)
 }
 
 // Upload handles the uploading process
-func (ts *TranslationService) Upload(ctx context.Context) error {
-	panic("unimplemented")
+func (ts *TranslationService) Upload(ctx context.Context, file *multipart.FileHeader) error {
+	f, err := file.Open()
+	if err != nil {
+		return err
+	}
+	decoder := json.NewDecoder(f)
+	_, err = decoder.Token()
+	if err != nil {
+		if errors.Is(err, io.EOF) {
+			return nil
+		}
+		return err
+	}
+	for decoder.More() {
+		// var translation requests.Translation
+		var tr *tms.Translation
+		if err := decoder.Decode(&tr); err != nil {
+			return err
+		}
+		// This could be optimized by having worker routines create the translations
+		// once they are successfully decoded.
+
+		// However, this will only make sense for a huge scale, as we also need to make sure that
+		// the go-routines are cleaned up neatly once the upload is done.
+		// This can be managed by sync.WaitGroups and context.
+
+		// Another alternative is to start the workers immediately the application starts
+		// and they can forever listen to create requests
+		if err := ts.translationRepo.Create(ctx, tr); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

@@ -1,8 +1,10 @@
 package servers
 
 import (
+	"fmt"
 	"translations/domains/tms"
 	"translations/requests"
+	"translations/responses"
 
 	"github.com/gin-gonic/gin"
 )
@@ -36,7 +38,24 @@ func (s *Server) createTranslation(ctx *gin.Context) {
 }
 
 func (s *Server) uploadTranslation(ctx *gin.Context) {
+	file, err := ctx.FormFile("file")
+	if err != nil {
+		println(err.Error())
+		badRequestFromError(ctx, err)
+		return
+	}
+	// Set a max upload limit to prevent locking down our resources.
+	// This max_upload_size can also be configured in kubernetes ingress
+	// Also check the mime-type to make sure we are not executing a binary
+	fmt.Println(file.Filename)
+	println(file.Size)
 
+	if err := s.translateService.Upload(ctx, file); err != nil {
+		internalError(ctx, err)
+		return
+	}
+
+	success(ctx, "translations uploaded successfully")
 }
 
 func (s *Server) translate(ctx *gin.Context) {
@@ -57,5 +76,5 @@ func (s *Server) translate(ctx *gin.Context) {
 		internalError(ctx, err)
 		return
 	}
-	success(ctx, res)
+	success(ctx, responses.TranslateResponse{Target: res})
 }

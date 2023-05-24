@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
+
 	"translations/domains/core"
 	"translations/domains/users"
 
@@ -28,7 +29,8 @@ var (
 func TestMain(m *testing.M) {
 	var code = 1
 	defer func() {
-		cleanup()
+		// cleanup()
+		fmt.Printf("Hello done!!!")
 		os.Exit(code)
 	}()
 	db, initErr = setupTestDB()

@@ -44,8 +44,11 @@ func TestCreate(t *testing.T) {
 	require.NoError(t, repo.Create(context.TODO(), e))
 	assert.NotEmpty(t, e.ID)
 
-	err = db.Exec("DELETE FROM translations WHERE id = ?", e.ID).Error
-	require.NoError(t, err)
+	t.Cleanup(func() {
+		if err := db.Exec("DELETE FROM translations WHERE id = ?", e.ID).Error; err != nil {
+			log.Fatal(err)
+		}
+	})
 }
 
 func TestFindTranslation(t *testing.T) {
