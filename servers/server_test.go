@@ -53,6 +53,7 @@ func setupTestDB() (*gorm.DB, error) {
 	dsn := "root:@tcp(127.0.0.1:3306)/translations?charset=utf8mb4&parseTime=True&loc=Local"
 	if env == "cicd" {
 		dsn = "test_user:password@tcp(127.0.0.1:33306)/translations?charset=utf8mb4&parseTime=True&loc=Local"
+		fmt.Printf("\n\nDSN: %s\n\n", dsn)
 	}
 	return gorm.Open(mysql.Open(dsn), &gorm.Config{})
 }
@@ -67,7 +68,6 @@ func cleanup() {
 	if err := db.Exec("DELETE FROM translations").Error; err != nil {
 		log.Fatal(err)
 	}
-
 }
 
 func requestHelper(t *testing.T, method, path, token string, payload []byte) *httptest.ResponseRecorder {
