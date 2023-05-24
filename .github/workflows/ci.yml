@@ -1,0 +1,78 @@
+name: Lint and Test
+on:
+  push:
+    branches:
+      - "main"
+
+  pull_request:
+    branches:
+      - "main"
+
+jobs:
+  lint:
+    name: Linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+          cache: false
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Lint and Vet
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_USER: test_user
+          MYSQL_PASSWORD: password
+          MYSQL_DATABASE: translations
+          ENVIRONMENT: cicd
+        ports:
+          - 33306:3306
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
+      - name: Test
+        run: ENVIRONMENT=cicd make test
+
+
+  test-with-race:
+    name: Test With Race
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_USER: test_user
+          MYSQL_PASSWORD: password
+          MYSQL_DATABASE: translations
+          ENVIRONMENT: cicd
+        ports:
+          - 33306:3306
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
+      - name: Test With Race
+        run: ENVIRONMENT=cicd make twr
