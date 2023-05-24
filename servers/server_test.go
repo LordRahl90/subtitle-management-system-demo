@@ -30,7 +30,7 @@ func TestMain(m *testing.M) {
 	var code = 1
 	defer func() {
 		if db == nil {
-			log.Fatal("db not initialized here!!!")
+			log.Fatal("db not initialized")
 		}
 		cleanup()
 		os.Exit(code)
@@ -58,14 +58,22 @@ func setupTestDB() (*gorm.DB, error) {
 	env := os.Getenv("ENVIRONMENT")
 	dsn := "root:@tcp(127.0.0.1:3306)/translations?charset=utf8mb4&parseTime=True&loc=Local"
 	if env == "cicd" {
-		dsn = "test_user:password@tcp(localhost:33061)/translations?charset=utf8mb4&parseTime=True&loc=Local"
+		dsn = "test_user:password@tcp(127.0.0.1:33061)/translations?charset=utf8mb4&parseTime=True&loc=Local"
 	}
 
-	dd, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic(err)
-	}
-	return dd, err
+	// db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	// if err != nil {
+	// 	panic(err)
+	// }
+	db, err := gorm.Open(mysql.New(mysql.Config{
+		DSN:                       dsn,   // data source name
+		DefaultStringSize:         256,   // default size for string fields
+		DisableDatetimePrecision:  true,  // disable datetime precision, which not supported before MySQL 5.6
+		DontSupportRenameIndex:    true,  // drop & create when rename index, rename index not supported before MySQL 5.7, MariaDB
+		DontSupportRenameColumn:   true,  // `change` when rename column, rename column not supported before MySQL 8, MariaDB
+		SkipInitializeWithVersion: false, // auto configure based on currently MySQL version
+	}), &gorm.Config{})
+	return db, err
 }
 
 func cleanup() {
