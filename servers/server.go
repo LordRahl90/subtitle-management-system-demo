@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"translations/domains/users"
+	"translations/services/tms"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -11,9 +12,11 @@ import (
 
 // Server contains the resources meant to server the endpoints
 type Server struct {
-	db          *gorm.DB
-	Router      *gin.Engine
-	userService users.IUserService
+	db               *gorm.DB
+	Router           *gin.Engine
+	userService      users.IUserService
+	translateService tms.Service
+	signingSecret    string
 }
 
 // New creates a new instance of server
@@ -23,16 +26,22 @@ func New(db *gorm.DB) (*Server, error) {
 	if err != nil {
 		return nil, err
 	}
+	translateService, err := tms.NewWithDefault(db)
+	if err != nil {
+		return nil, err
+	}
 
 	s := &Server{
-		db:          db,
-		Router:      router,
-		userService: userService,
+		db:               db,
+		Router:           router,
+		userService:      userService,
+		translateService: translateService,
 	}
 
 	s.Router.POST("/login", s.authenticate)
 	s.Router.POST("/users/create", s.createUser)
 	s.Router.Use(s.authenticated())
+	s.tmsRoutes()
 
 	return s, nil
 }
@@ -56,13 +65,6 @@ func badRequestFromError(c *gin.Context, err error) {
 	c.JSON(http.StatusBadRequest, gin.H{
 		"success": false,
 		"error":   err.Error(),
-	})
-}
-
-func notFound(c *gin.Context) {
-	c.JSON(http.StatusNotFound, gin.H{
-		"success": false,
-		"error":   "not found",
 	})
 }
 

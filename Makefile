@@ -4,7 +4,7 @@ start:
 test:
 	go test ./... --cover
 
-test-race:
+test-with-race:
 	go test -race ./... --cover
 
-tr: test-race
+twr: test-race
