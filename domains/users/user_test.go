@@ -126,21 +126,18 @@ func TestFindUserByEmail(t *testing.T) {
 	assert.Equal(t, rec.Name, res.Name)
 }
 
-func setupTestDB() *gorm.DB {
+func setupTestDB() (*gorm.DB, error) {
 	env := os.Getenv("ENVIRONMENT")
 	dsn := "root:@tcp(127.0.0.1:3306)/translations?charset=utf8mb4&parseTime=True&loc=Local"
 	if env == "cicd" {
 		dsn = "test_user:password@tcp(127.0.0.1:33306)/translations?charset=utf8mb4&parseTime=True&loc=Local"
 	}
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic(err)
-	}
-	return db
+
+	return gorm.Open(mysql.Open(dsn), &gorm.Config{})
 }
 
 func cleanup() {
-	if err := db.Exec("DELETE FROM users"); err != nil {
+	if err := db.Exec("DELETE FROM users").Error; err != nil {
 		log.Fatal(err)
 	}
 }
