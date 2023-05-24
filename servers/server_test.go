@@ -29,6 +29,9 @@ var (
 func TestMain(m *testing.M) {
 	var code = 1
 	defer func() {
+		if db == nil {
+			panic("db not initialized here!!!")
+		}
 		cleanup()
 		os.Exit(code)
 	}()
