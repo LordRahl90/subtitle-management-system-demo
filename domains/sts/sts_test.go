@@ -59,7 +59,8 @@ func TestCreateSubtitle(t *testing.T) {
 
 	t.Cleanup(func() {
 		if err := db.Exec("DELETE FROM subtitles WHERE id = ?", s.ID).Error; err != nil {
-			log.Fatal(err)
+			panic(err)
+			// log.Fatal(err)
 		}
 	})
 
@@ -90,7 +91,8 @@ func TestCreateContent(t *testing.T) {
 	assert.NotEmpty(t, c.ID)
 
 	if err := db.Exec("DELETE FROM contents WHERE id = ?", c.ID).Error; err != nil {
-		log.Fatal(err)
+		panic(err)
+		// log.Fatal(err)
 	}
 }
 
@@ -150,9 +152,6 @@ func setupTestDB() (*gorm.DB, error) {
 	if env == "cicd" {
 		dsn = "test_user:password@tcp(127.0.0.1:33306)/translations?charset=utf8mb4&parseTime=True&loc=Local"
 	}
-	dd, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic(err)
-	}
-	return dd, err
+
+	return gorm.Open(mysql.Open(dsn), &gorm.Config{})
 }
