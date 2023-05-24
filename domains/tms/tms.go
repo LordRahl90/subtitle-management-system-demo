@@ -3,6 +3,7 @@ package tms
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -23,7 +24,7 @@ func New(db *gorm.DB) (Manager, error) {
 	}, nil
 }
 
-// Find implements Manager
+// Find finds a translation
 func (tr *TranslationRepository) Find(ctx context.Context, sourceLang string, targetLang string, sentence string) (*Translation, error) {
 	var result Translation
 	err := tr.db.Where("source_language = ? AND target_language = ? AND source = ?",
@@ -32,7 +33,7 @@ func (tr *TranslationRepository) Find(ctx context.Context, sourceLang string, ta
 	return &result, err
 }
 
-// FindByID implements Manager
+// FindByID finds the translation by ID
 func (tr *TranslationRepository) FindByID(ctx context.Context, id string) (*Translation, error) {
 	var result Translation
 	err := tr.db.Where("id = ? ", id).First(&result).Error
@@ -40,12 +41,16 @@ func (tr *TranslationRepository) FindByID(ctx context.Context, id string) (*Tran
 	return &result, err
 }
 
-// Update implements Manager
+// Update updates the target sentence
 func (tr *TranslationRepository) Update(ctx context.Context, e *Translation) error {
-	panic("unimplemented")
+	return tr.db.
+		Model(&Translation{}).
+		Where("id = ?", e.ID).
+		Update("target", e.Target).Error
 }
 
 // Create saves a new translation content to the database
-func (tr *TranslationRepository) Create(ctx context.Context, e Translation) error {
+func (tr *TranslationRepository) Create(ctx context.Context, e *Translation) error {
+	e.ID = uuid.NewString()
 	return tr.db.WithContext(ctx).Save(&e).Error
 }
