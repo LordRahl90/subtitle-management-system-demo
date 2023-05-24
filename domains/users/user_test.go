@@ -2,6 +2,7 @@ package users
 
 import (
 	"context"
+	"log"
 	"os"
 	"testing"
 
@@ -139,7 +140,9 @@ func setupTestDB() *gorm.DB {
 }
 
 func cleanup() {
-	db.Exec("DELETE FROM users")
+	if err := db.Exec("DELETE FROM users"); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func newUser(t *testing.T) *User {
