@@ -29,7 +29,7 @@ var (
 func TestMain(m *testing.M) {
 	var code = 1
 	defer func() {
-		cleanup()
+		// cleanup()
 		os.Exit(code)
 	}()
 	db, initErr = setupTestDB()
@@ -54,15 +54,15 @@ func setupTestDB() (*gorm.DB, error) {
 	return gorm.Open(mysql.Open(dsn), &gorm.Config{})
 }
 
-func cleanup() {
-	if err := db.Exec("DELETE FROM users").Error; err != nil {
-		log.Fatal(err)
-	}
-	if err := db.Exec("DELETE FROM translations").Error; err != nil {
-		log.Fatal(err)
-	}
+// func cleanup() {
+// 	if err := db.Exec("DELETE FROM users").Error; err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	if err := db.Exec("DELETE FROM translations").Error; err != nil {
+// 		log.Fatal(err)
+// 	}
 
-}
+// }
 
 func requestHelper(t *testing.T, method, path, token string, payload []byte) *httptest.ResponseRecorder {
 	t.Helper()
