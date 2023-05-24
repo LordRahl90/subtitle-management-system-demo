@@ -23,5 +23,4 @@ func TestCreateTranslation(t *testing.T) {
 
 	res := requestHelper(t, http.MethodPost, "/tms", token, b)
 	require.Equal(t, http.StatusCreated, res.Code)
-
 }
