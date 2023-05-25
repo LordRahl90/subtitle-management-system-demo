@@ -2,7 +2,6 @@ package servers
 
 import (
 	"bytes"
-	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -79,7 +78,6 @@ func requestHelper(t *testing.T, method, path, token string, payload []byte) *ht
 	if len(payload) == 0 {
 		req, err = http.NewRequest(method, path, nil)
 	} else {
-		println(payload)
 		req, err = http.NewRequest(method, path, bytes.NewBuffer(payload))
 	}
 
@@ -90,7 +88,6 @@ func requestHelper(t *testing.T, method, path, token string, payload []byte) *ht
 	}
 	server.Router.ServeHTTP(w, req)
 	require.NotNil(t, w)
-	fmt.Println(w.Body.String())
 	return w
 }
 

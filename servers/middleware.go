@@ -16,7 +16,6 @@ var nonAuthPath = map[string]struct{}{
 
 func (s *Server) authenticated() func(c *gin.Context) {
 	return func(ctx *gin.Context) {
-		println("full path: ", ctx.FullPath())
 		if _, ok := nonAuthPath[ctx.FullPath()]; ok {
 			ctx.Next()
 			return

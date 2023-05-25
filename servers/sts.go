@@ -84,6 +84,7 @@ func (s *Server) downloadFile(ctx *gin.Context) {
 	if err != nil {
 		if os.IsNotExist(err) {
 			notFound(ctx, "file not found")
+			return
 		}
 		internalError(ctx, err)
 		return

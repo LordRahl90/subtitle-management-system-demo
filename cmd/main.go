@@ -25,7 +25,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	server, err := servers.New(db, signingSecret, "outputs")
+	server, err := servers.New(db, signingSecret, "outputs/")
 	if err != nil {
 		log.Fatal(err)
 	}

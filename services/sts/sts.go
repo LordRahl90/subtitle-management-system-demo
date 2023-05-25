@@ -89,7 +89,8 @@ func (ss *SubtitleService) Upload(ctx context.Context, outputDirectory, subtitle
 		return "", nil
 	}
 	defer f.Close()
-	outputPath := outputDirectory + file.Filename + "-" + primitive.NewObjectID().Hex() + ".txt"
+	fileName := file.Filename + "-" + primitive.NewObjectID().Hex() + ".txt"
+	outputPath := outputDirectory + fileName
 	if _, err := os.Stat(outputPath); os.IsNotExist(err) {
 		if err := os.MkdirAll(filepath.Dir(outputPath), 0700); err != nil {
 			return "", err
@@ -130,7 +131,7 @@ func (ss *SubtitleService) Upload(ctx context.Context, outputDirectory, subtitle
 		}
 	}
 
-	return outputPath, nil
+	return fileName, nil
 }
 
 func parseLine(ctx context.Context, line, subtitleID string) *sts.Content {

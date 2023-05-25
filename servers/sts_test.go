@@ -200,8 +200,6 @@ func TestUploadSubtitleFiles(t *testing.T) {
 
 	server.Router.ServeHTTP(w, req)
 
-	println(w.Body.String())
-
 	require.Equal(t, http.StatusOK, w.Code)
 	var result []string
 	err = json.Unmarshal(w.Body.Bytes(), &result)
@@ -210,7 +208,7 @@ func TestUploadSubtitleFiles(t *testing.T) {
 	assert.Len(t, result, 2)
 
 	for _, v := range result {
-		require.NoError(t, os.Remove(v))
+		require.NoError(t, os.Remove(server.outputDirectory+"/"+v))
 	}
 }
 
@@ -221,4 +219,23 @@ func TestDownloadSubtitleFile(t *testing.T) {
 	res := requestHelper(t, http.MethodGet, "/sts/download/"+fileName, token, nil)
 	require.Equal(t, http.StatusOK, res.Code)
 
+}
+
+func TestDownloadNonExistentFile(t *testing.T) {
+	token := createToken(t)
+	fileName := "subtitles-unknwn.txt"
+
+	res := requestHelper(t, http.MethodGet, "/sts/download/"+fileName, token, nil)
+	require.Equal(t, http.StatusNotFound, res.Code)
+	exp := `{"error":"file not found","success":false}`
+	assert.Equal(t, exp, res.Body.String())
+}
+
+func TestDownloadWithoutToken(t *testing.T) {
+	fileName := "subtitles-unknwn.txt"
+
+	res := requestHelper(t, http.MethodGet, "/sts/download/"+fileName, "", nil)
+	require.Equal(t, http.StatusUnauthorized, res.Code)
+	exp := `{"error":"authorization token not provided","success":false}`
+	assert.Equal(t, exp, res.Body.String())
 }
