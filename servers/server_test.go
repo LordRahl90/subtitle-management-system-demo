@@ -55,12 +55,7 @@ func setupTestDB() (*gorm.DB, error) {
 	if env == "cicd" {
 		dsn = "test_user:password@tcp(127.0.0.1:33306)/translations?charset=utf8mb4&parseTime=True&loc=Local"
 	}
-
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic(err)
-	}
-	return db, err
+	return gorm.Open(mysql.Open(dsn), &gorm.Config{})
 }
 
 func cleanup() {

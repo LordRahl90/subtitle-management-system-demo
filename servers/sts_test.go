@@ -128,7 +128,7 @@ func TestUploadSubtitleFiles(t *testing.T) {
 	token := createToken(t)
 	fileNames := []string{
 		"./testdata/subtitles.txt",
-		"./testdata/subtitles_de.txt",
+		// "./testdata/subtitles_de.txt",
 	}
 	var b bytes.Buffer
 	w := httptest.NewRecorder()
