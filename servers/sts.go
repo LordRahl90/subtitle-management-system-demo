@@ -10,6 +10,7 @@ func (s *Server) stsRoutes() {
 	stsRoute := s.Router.Group("sts")
 	{
 		stsRoute.POST("", s.createSubtitle)
+		stsRoute.POST("upload", s.uploadSubtitles)
 	}
 }
 
@@ -26,4 +27,23 @@ func (s *Server) createSubtitle(ctx *gin.Context) {
 	}
 
 	created(ctx, res)
+}
+
+func (s *Server) uploadSubtitles(ctx *gin.Context) {
+	form, err := ctx.MultipartForm()
+	if err != nil {
+		badRequestFromError(ctx, err)
+		return
+	}
+	name := ctx.PostForm("name")
+	sourceLang := ctx.PostForm("source_language")
+	targetLang := ctx.PostForm("target_language")
+	files := form.File["files"]
+
+	for _, file := range files {
+		println(file.Filename)
+	}
+
+	println("Length: ", len(files))
+	println(name, sourceLang, targetLang)
 }

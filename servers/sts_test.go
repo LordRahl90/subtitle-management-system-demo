@@ -1,9 +1,14 @@
 package servers
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"io"
+	"mime/multipart"
 	"net/http"
+	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 
@@ -117,4 +122,55 @@ func TestCreateSubtitle_WithTranslationUploaded(t *testing.T) {
 	assert.NotEmpty(t, contents[1].ID)
 	assert.Equal(t, req.Content[1].TimeRange, contents[1].TimeRange)
 	assert.Equal(t, "Komm zurück zum Licht.", contents[1].Content)
+}
+
+func TestUploadSubtitleFiles(t *testing.T) {
+	token := createToken(t)
+	fileNames := []string{
+		"./testdata/subtitles.txt",
+		"./testdata/subtitles_de.txt",
+	}
+	var b bytes.Buffer
+	w := httptest.NewRecorder()
+	writer := multipart.NewWriter(&b)
+
+	for _, v := range fileNames {
+		form, err := writer.CreateFormFile("files", v)
+		require.NoError(t, err)
+
+		file, err := os.Open(v)
+		require.NoError(t, err)
+		_, err = io.Copy(form, file)
+		require.NoError(t, err)
+		file.Close()
+	}
+	name, err := writer.CreateFormField("name")
+	require.NoError(t, err)
+	_, err = name.Write([]byte("lord of the rings"))
+	require.NoError(t, err)
+
+	sourceLang, err := writer.CreateFormField("source_language")
+	require.NoError(t, err)
+	_, err = sourceLang.Write([]byte("en"))
+	require.NoError(t, err)
+
+	targetLang, err := writer.CreateFormField("target_language")
+	require.NoError(t, err)
+	_, err = targetLang.Write([]byte("de"))
+	require.NoError(t, err)
+	writer.Close()
+
+	req, err := http.NewRequest(http.MethodPost, "/sts/upload", &b)
+	require.NoError(t, err)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	req.Header.Set("Authorization", "Bearer "+token)
+
+	server.Router.ServeHTTP(w, req)
+
+	println(w.Body.String())
+
+	// require.Equal(t, http.StatusOK, w.Code)
+	// exp := `"translations uploaded successfully"`
+	// assert.Equal(t, exp, w.Body.String())
+
 }
