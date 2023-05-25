@@ -70,6 +70,7 @@ func setupTestDB() (*gorm.DB, error) {
 	if err != nil {
 		panic(err)
 	}
+	sqlDB.SetConnMaxLifetime(0)
 	gormDB, err := gorm.Open(mysql.New(mysql.Config{
 		Conn: sqlDB,
 	}), &gorm.Config{})
