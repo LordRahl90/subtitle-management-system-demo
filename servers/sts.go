@@ -1,6 +1,8 @@
 package servers
 
 import (
+	"fmt"
+	"os"
 	"translations/requests"
 
 	"github.com/gin-gonic/gin"
@@ -11,6 +13,7 @@ func (s *Server) stsRoutes() {
 	{
 		stsRoute.POST("", s.createSubtitle)
 		stsRoute.POST("upload", s.uploadSubtitles)
+		stsRoute.GET("download/:filename", s.downloadFile)
 	}
 }
 
@@ -57,20 +60,38 @@ func (s *Server) uploadSubtitles(ctx *gin.Context) {
 		return
 	}
 
+	outputFile := []string{}
+
 	for _, file := range files {
 		res, err := s.subtitleService.Upload(ctx.Request.Context(), res.ID, sourceLang, targetLang, file)
 		if err != nil {
 			internalError(ctx, err)
 		}
-		println("output file: ", res)
+		outputFile = append(outputFile, res)
 	}
 
-	println("Length: ", len(files))
-	println(name, sourceLang, targetLang)
+	// the file path are returned to be downloaded individually.
+	success(ctx, outputFile)
 
-	ctx.Header("Content-Disposition", "attachment;filename=hello.txt")
+}
+
+func (s *Server) downloadFile(ctx *gin.Context) {
+	fileName := ctx.Param("filename")
+	outputDirectory := "./testdata/outputs"
+	file := fmt.Sprintf("%s/%s", outputDirectory, fileName)
+
+	content, err := os.ReadFile(file)
+	if err != nil {
+		if os.IsNotExist(err) {
+			notFound(ctx, "file not found")
+		}
+		internalError(ctx, err)
+		return
+	}
+
+	ctx.Header("Content-Disposition", "attachment;filename="+fileName)
 	ctx.Header("Content-Type", "application/text/plain")
-	if _, err := ctx.Writer.Write([]byte("hello hello world")); err != nil {
+	if _, err := ctx.Writer.Write(content); err != nil {
 		internalError(ctx, err)
 		return
 	}

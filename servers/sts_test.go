@@ -202,8 +202,19 @@ func TestUploadSubtitleFiles(t *testing.T) {
 
 	println(w.Body.String())
 
-	// require.Equal(t, http.StatusOK, w.Code)
-	// exp := `"translations uploaded successfully"`
-	// assert.Equal(t, exp, w.Body.String())
+	require.Equal(t, http.StatusOK, w.Code)
+	var result []string
+	err = json.Unmarshal(w.Body.Bytes(), &result)
+	require.NoError(t, err)
+	require.NotNil(t, result)
+	assert.Len(t, result, 2)
+}
+
+func TestDownloadSubtitleFile(t *testing.T) {
+	token := createToken(t)
+	fileName := "subtitles.txt"
+
+	res := requestHelper(t, http.MethodGet, "/sts/download/"+fileName, token, nil)
+	require.Equal(t, http.StatusOK, res.Code)
 
 }

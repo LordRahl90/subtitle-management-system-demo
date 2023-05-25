@@ -22,13 +22,15 @@ import (
 type SubtitleService struct {
 	translationService tms.Service
 	subtitleRepository sts.Manager
+	outputDirectory    string
 }
 
 // New returns a new service with the provided repo
-func New(repo sts.Manager, tm tms.Service) Service {
+func New(repo sts.Manager, tm tms.Service, outputDirectory string) Service {
 	return &SubtitleService{
 		subtitleRepository: repo,
 		translationService: tm,
+		outputDirectory:    outputDirectory,
 	}
 }
 
@@ -149,7 +151,8 @@ func parseLine(ctx context.Context, line, subtitleID string) *sts.Content {
 }
 
 // NewWithDefault return a subtitle service with default connection
-func NewWithDefault(db *gorm.DB) (Service, error) {
+// outputs is the default
+func NewWithDefault(db *gorm.DB, outputDirectory string) (Service, error) {
 	repo, err := sts.New(db)
 	if err != nil {
 		return nil, err
@@ -158,5 +161,5 @@ func NewWithDefault(db *gorm.DB) (Service, error) {
 	if err != nil {
 		return nil, err
 	}
-	return New(repo, tmsRepo), nil
+	return New(repo, tmsRepo, outputDirectory), nil
 }

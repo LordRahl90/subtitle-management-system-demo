@@ -36,7 +36,7 @@ func (s *Server) authenticate(ctx *gin.Context) {
 		UserID: res.ID,
 		Email:  res.Email,
 	}
-	token, err := td.Generate()
+	token, err := td.Generate(s.signingSecret)
 	if err != nil {
 		badRequestFromError(ctx, err)
 		return
@@ -74,7 +74,7 @@ func (s *Server) createUser(ctx *gin.Context) {
 		UserID: dbUser.ID,
 		Email:  dbUser.Email,
 	}
-	token, err := td.Generate()
+	token, err := td.Generate(s.signingSecret)
 	if err != nil {
 		badRequestFromError(ctx, err)
 		return

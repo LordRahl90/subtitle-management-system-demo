@@ -18,13 +18,14 @@ func main() {
 			log.Fatal(err)
 		}
 	}
+	signingSecret := os.Getenv("SIGNING_SECRET")
 
 	db, err := setupDB()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	server, err := servers.New(db)
+	server, err := servers.New(db, signingSecret, "outputs")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -15,6 +15,7 @@ services:
       DB_USER: sub_user
       DB_PASSWORD: p@ssword
       DB_NAME: translations
+      SIGNING_SECRET: hello-world
 
     depends_on:
       translationsdb:

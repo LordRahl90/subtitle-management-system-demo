@@ -35,7 +35,7 @@ func (s *Server) authenticated() func(c *gin.Context) {
 			return
 		}
 		authToken := authData[1]
-		userInfo, err := core.Decode(authToken)
+		userInfo, err := core.Decode(authToken, s.signingSecret)
 		if err != nil || userInfo == nil {
 			unAuthorized(ctx, err)
 			ctx.Abort()

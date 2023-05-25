@@ -20,10 +20,11 @@ import (
 )
 
 var (
-	server        *Server
-	db            *gorm.DB
-	initErr       error
-	signingSecret = "hello-world"
+	server          *Server
+	db              *gorm.DB
+	initErr         error
+	signingSecret   = "hello-world"
+	outputDirectory = "./testdata/outputs/"
 )
 
 func TestMain(m *testing.M) {
@@ -40,7 +41,7 @@ func TestMain(m *testing.M) {
 		log.Fatal(initErr)
 	}
 
-	s, err := New(db)
+	s, err := New(db, signingSecret, outputDirectory)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -100,7 +101,7 @@ func createToken(t *testing.T) string {
 		Email:    gofakeit.Email(),
 		UserType: string(users.UserTypeAdmin),
 	}
-	token, err := td.Generate()
+	token, err := td.Generate(server.signingSecret)
 	require.NoError(t, err)
 	require.NotEmpty(t, token)
 

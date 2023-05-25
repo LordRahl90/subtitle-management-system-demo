@@ -9,7 +9,7 @@ import (
 )
 
 // SigningSecret global signing secret variable
-var SigningSecret string
+// var SigningSecret string
 
 // TokenData returns the base information storeed within a JWT token
 type TokenData struct {
@@ -23,7 +23,7 @@ type AuthClaims struct {
 }
 
 // Generate generates an auth secret
-func (t *TokenData) Generate() (string, error) {
+func (t *TokenData) Generate(signingSecret string) (string, error) {
 	claims := &AuthClaims{
 		t,
 		jwt.RegisteredClaims{
@@ -37,16 +37,16 @@ func (t *TokenData) Generate() (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(SigningSecret))
+	return token.SignedString([]byte(signingSecret))
 }
 
 // Decode decodes the jwt value and returns token data
-func Decode(token string) (*TokenData, error) {
+func Decode(token, signingSecret string) (*TokenData, error) {
 	tk, err := jwt.ParseWithClaims(token, &AuthClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("invalid signing method")
 		}
-		return []byte(SigningSecret), nil
+		return []byte(signingSecret), nil
 	})
 	if err != nil {
 		return nil, err

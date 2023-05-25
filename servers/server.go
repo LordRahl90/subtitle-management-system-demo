@@ -19,11 +19,13 @@ type Server struct {
 	translateService tms.Service
 	subtitleService  sts.Service
 	signingSecret    string
+	outputDirectory  string
 }
 
 // New creates a new instance of server
-func New(db *gorm.DB) (*Server, error) {
+func New(db *gorm.DB, signingSecret, outputDirectory string) (*Server, error) {
 	router := gin.Default()
+	router.MaxMultipartMemory = 8 << 20
 	userService, err := users.New(db)
 	if err != nil {
 		return nil, err
@@ -33,7 +35,7 @@ func New(db *gorm.DB) (*Server, error) {
 		return nil, err
 	}
 
-	subtitleService, err := sts.NewWithDefault(db)
+	subtitleService, err := sts.NewWithDefault(db, outputDirectory)
 	if err != nil {
 		return nil, err
 	}
@@ -44,6 +46,8 @@ func New(db *gorm.DB) (*Server, error) {
 		userService:      userService,
 		translateService: translateService,
 		subtitleService:  subtitleService,
+		signingSecret:    signingSecret,
+		outputDirectory:  outputDirectory,
 	}
 	s.Router.Use(s.authenticated())
 	s.Router.POST("/login", s.authenticate)
@@ -73,6 +77,13 @@ func badRequestFromError(c *gin.Context, err error) {
 	c.JSON(http.StatusBadRequest, gin.H{
 		"success": false,
 		"error":   err.Error(),
+	})
+}
+
+func notFound(c *gin.Context, err string) {
+	c.JSON(http.StatusNotFound, gin.H{
+		"success": false,
+		"error":   err,
 	})
 }
 
