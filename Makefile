@@ -2,7 +2,7 @@ start:
 	go run ./cmd
 
 test:
-	go test ./... --cover -v
+	go test ./... --cover
 
 test-with-race:
 	go test -race ./... --cover
