@@ -128,7 +128,7 @@ func TestUploadSubtitleFiles(t *testing.T) {
 	token := createToken(t)
 	fileNames := []string{
 		"./testdata/subtitles.txt",
-		// "./testdata/subtitles_de.txt",
+		"./testdata/subtitles_de.txt",
 	}
 
 	ctx := context.Background()
@@ -145,6 +145,18 @@ func TestUploadSubtitleFiles(t *testing.T) {
 			TargetLanguage: "de",
 			Source:         "Come back to the light.",
 			Target:         "Komm zurück zum Licht.",
+		},
+		{
+			TargetLanguage: "en",
+			SourceLanguage: "de",
+			Target:         "I am Arwen - I've come to help you.",
+			Source:         "Ich bin Arwen - Ich bin gekommen, um dir zu helfen.",
+		},
+		{
+			TargetLanguage: "en",
+			SourceLanguage: "de",
+			Target:         "Come back to the light.",
+			Source:         "Komm zurück zum Licht.",
 		},
 	}
 	for _, v := range tr {

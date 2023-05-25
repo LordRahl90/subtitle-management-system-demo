@@ -1,0 +1,47 @@
+version: '3.1'
+services:
+  subscriptions:
+    container_name: translations
+    image: lordrahl/translations:latest
+    entrypoint: ./translations
+    ports:
+      - 8080:8080
+    volumes:
+      - ./outputs/:/outputs/
+    environment:
+      ENVIRONMENT: "docker"
+      DB_HOST: translationsdb
+      DB_PORT: 3306
+      DB_USER: sub_user
+      DB_PASSWORD: p@ssword
+      DB_NAME: translations
+
+    depends_on:
+      translationsdb:
+        condition: service_healthy
+
+    networks:
+      - translations
+
+
+  translationsdb:
+    container_name: translations-db
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_USER: sub_user
+      MYSQL_PASSWORD: p@ssword
+      MYSQL_DATABASE: translations
+    networks:
+      - translations
+
+    healthcheck: # check the healthiness with the following configuration
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '--user=sub_user', '--password=p@ssword']
+      interval: 3s
+      timeout: 3s
+      retries: 5
+
+networks:
+  translations:
+    driver: bridge
+    
