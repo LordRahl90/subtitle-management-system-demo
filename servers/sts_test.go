@@ -208,6 +208,10 @@ func TestUploadSubtitleFiles(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, result)
 	assert.Len(t, result, 2)
+
+	for _, v := range result {
+		require.NoError(t, os.Remove(v))
+	}
 }
 
 func TestDownloadSubtitleFile(t *testing.T) {

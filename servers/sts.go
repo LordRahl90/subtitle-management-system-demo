@@ -63,9 +63,10 @@ func (s *Server) uploadSubtitles(ctx *gin.Context) {
 	outputFile := []string{}
 
 	for _, file := range files {
-		res, err := s.subtitleService.Upload(ctx.Request.Context(), res.ID, sourceLang, targetLang, file)
+		res, err := s.subtitleService.Upload(ctx.Request.Context(), s.outputDirectory, res.ID, sourceLang, targetLang, file)
 		if err != nil {
 			internalError(ctx, err)
+			return
 		}
 		outputFile = append(outputFile, res)
 	}
@@ -77,8 +78,7 @@ func (s *Server) uploadSubtitles(ctx *gin.Context) {
 
 func (s *Server) downloadFile(ctx *gin.Context) {
 	fileName := ctx.Param("filename")
-	outputDirectory := "./testdata/outputs"
-	file := fmt.Sprintf("%s/%s", outputDirectory, fileName)
+	file := fmt.Sprintf("%s/%s", s.outputDirectory, fileName)
 
 	content, err := os.ReadFile(file)
 	if err != nil {

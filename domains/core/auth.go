@@ -8,9 +8,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// SigningSecret global signing secret variable
-// var SigningSecret string
-
 // TokenData returns the base information storeed within a JWT token
 type TokenData struct {
 	UserID, Email, UserType string
