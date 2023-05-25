@@ -130,6 +130,27 @@ func TestUploadSubtitleFiles(t *testing.T) {
 		"./testdata/subtitles.txt",
 		// "./testdata/subtitles_de.txt",
 	}
+
+	ctx := context.Background()
+	// upload some translations
+	tr := []*tms.Translation{
+		{
+			SourceLanguage: "en",
+			TargetLanguage: "de",
+			Source:         "I am Arwen - I've come to help you.",
+			Target:         "Ich bin Arwen - Ich bin gekommen, um dir zu helfen.",
+		},
+		{
+			SourceLanguage: "en",
+			TargetLanguage: "de",
+			Source:         "Come back to the light.",
+			Target:         "Komm zurück zum Licht.",
+		},
+	}
+	for _, v := range tr {
+		require.NoError(t, server.translateService.Create(ctx, v))
+	}
+
 	var b bytes.Buffer
 	w := httptest.NewRecorder()
 	writer := multipart.NewWriter(&b)

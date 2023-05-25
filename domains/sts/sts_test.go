@@ -67,8 +67,7 @@ func TestCreateSubtitle(t *testing.T) {
 func TestCreateContent(t *testing.T) {
 	c := &Content{
 		SubtitleID: uuid.NewString(),
-		TimeStart:  "00:01:20.00",
-		TimeStop:   "00:02:00.00",
+		TimeRange:  "00:01:20.00 - 00:02:00.00",
 		Content:    "Hello World",
 	}
 
@@ -99,21 +98,15 @@ func TestFindContentByTimestamp(t *testing.T) {
 	c := []*Content{
 		{
 			SubtitleID: subtitleID,
-			TimeStart:  "00:00:12.00",
-			TimeStop:   "00:01:20.00",
-			TimeRange:  "00:00:12.00 - 00:01:20.00",
+			TimeRange:  "00:01:20.00 - 00:02:00.00",
 			Content:    "Ich bin Arwen - Ich bin gekommen, um dir zu helfen.",
 		},
 		{
 			SubtitleID: subtitleID,
-			TimeStart:  "00:03:55.00",
-			TimeStop:   "00:04:20.00",
 			TimeRange:  "00:03:55.00 - 00:04:20.00",
 			Content:    "Komm zurück zum Licht.",
 		}, {
 			SubtitleID: subtitleID,
-			TimeStart:  "00:04:59.00",
-			TimeStop:   "00:05:30.00",
 			TimeRange:  "00:04:59.00 - 00:05:30.00",
 			Content:    " Nein, my Schatz!!.",
 		},

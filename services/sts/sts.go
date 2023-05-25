@@ -3,13 +3,18 @@ package sts
 import (
 	"bufio"
 	"context"
+	"fmt"
 	"mime/multipart"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"translations/domains/sts"
 	"translations/requests"
 	"translations/responses"
 	"translations/services/tms"
 
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"gorm.io/gorm"
 )
 
@@ -81,20 +86,62 @@ func (ss *SubtitleService) Upload(ctx context.Context, subtitleID, sourceLanguag
 		return "", nil
 	}
 	defer f.Close()
+	outputPath := "./outputs/" + primitive.NewObjectID().Hex() + ".txt"
+	if _, err := os.Stat(outputPath); os.IsNotExist(err) {
+		if err := os.MkdirAll(filepath.Dir(outputPath), 0700); err != nil {
+			return "", err
+		}
+	}
+
+	outputFile, err := os.Create(outputPath)
+	if err != nil {
+		return "", err
+	}
+	defer outputFile.Close()
 	scanner := bufio.NewScanner(f)
 	scanner.Split(bufio.ScanLines)
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		println(line)
+		ct := parseLine(ctx, line, subtitleID)
+		if ct == nil {
+			continue
+		}
+		if err := ss.subtitleRepository.CreateContent(ctx, ct); err != nil {
+			return "", err
+		}
+
+		// lookup the translation as well
+		res, err := ss.translationService.Translate(ctx, ct.Content, sourceLanguage, targetLanguage)
+		if err != nil {
+			return "", err
+		}
+
+		if _, err := outputFile.Write(
+			[]byte(fmt.Sprintf("%s [%s] %s\n", ct.ContentSeq, ct.TimeRange, res))); err != nil {
+			return "", nil
+		}
 	}
 
-	return "", nil
+	return outputPath, nil
 }
 
-// func parseLines(ctx context.Context, line, subtitleID, sourceLanguage, targetLanguage string) *sts.Content {
-// 	return nil
-// }
+func parseLine(ctx context.Context, line, subtitleID string) *sts.Content {
+	if line == "" {
+		return nil
+	}
+	bs := strings.Index(line, "[")
+	be := strings.Index(line, "]")
+	seq := strings.Trim(line[:bs], " ")
+	tr := line[bs+1 : be]
+	content := strings.Trim(line[be+1:], " ")
+	return &sts.Content{
+		SubtitleID: subtitleID,
+		ContentSeq: seq,
+		TimeRange:  tr,
+		Content:    content,
+	}
+}
 
 // NewWithDefault return a subtitle service with default connection
 func NewWithDefault(db *gorm.DB) (Service, error) {
