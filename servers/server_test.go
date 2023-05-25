@@ -78,6 +78,7 @@ func requestHelper(t *testing.T, method, path, token string, payload []byte) *ht
 	if len(payload) == 0 {
 		req, err = http.NewRequest(method, path, nil)
 	} else {
+		println(payload)
 		req, err = http.NewRequest(method, path, bytes.NewBuffer(payload))
 	}
 

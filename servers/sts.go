@@ -46,4 +46,8 @@ func (s *Server) uploadSubtitles(ctx *gin.Context) {
 
 	println("Length: ", len(files))
 	println(name, sourceLang, targetLang)
+
+	ctx.Header("Content-Disposition", "attachment;filename=hello.txt")
+	ctx.Header("Content-Type", "application/text/plain")
+	ctx.Writer.Write([]byte("hello hello world"))
 }

@@ -45,10 +45,9 @@ func New(db *gorm.DB) (*Server, error) {
 		translateService: translateService,
 		subtitleService:  subtitleService,
 	}
-
+	s.Router.Use(s.authenticated())
 	s.Router.POST("/login", s.authenticate)
 	s.Router.POST("/users/create", s.createUser)
-	s.Router.Use(s.authenticated())
 	s.tmsRoutes()
 	s.stsRoutes()
 

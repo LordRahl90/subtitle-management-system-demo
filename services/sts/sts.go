@@ -71,8 +71,17 @@ func (ss *SubtitleService) Create(ctx context.Context, e *requests.Subtitle) (re
 }
 
 // Upload uploads a subtitle record
-func (ss *SubtitleService) Upload(ctx context.Context, sourceLanguage string, file *multipart.FileHeader) error {
-	panic("unimplemented")
+// reads the lines
+// parses the lines and extract contents
+// generates a translation and writes it to a file
+func (ss *SubtitleService) Upload(ctx context.Context, sourceLanguage string, file *multipart.FileHeader) (string, error) {
+	f, err := file.Open()
+	if err != nil {
+		return "", nil
+	}
+	defer f.Close()
+
+	return "", nil
 }
 
 // NewWithDefault return a subtitle service with default connection
