@@ -2,7 +2,6 @@ package servers
 
 import (
 	"bytes"
-	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -62,20 +61,20 @@ func setupTestDB() (*gorm.DB, error) {
 		dsn = "test_user:password@tcp(127.0.0.1:33306)/translations?charset=utf8mb4&parseTime=True&loc=Local"
 	}
 
-	// db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	// if err != nil {
-	// 	panic(err)
-	// }
-	sqlDB, err := sql.Open("mysql", dsn)
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
-	sqlDB.SetConnMaxLifetime(0)
-	sqlDB.SetMaxIdleConns(0)
-	gormDB, err := gorm.Open(mysql.New(mysql.Config{
-		Conn: sqlDB,
-	}), &gorm.Config{})
-	return gormDB, err
+	// sqlDB, err := sql.Open("mysql", dsn)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// sqlDB.SetConnMaxLifetime(0)
+	// sqlDB.SetMaxIdleConns(0)
+	// gormDB, err := gorm.Open(mysql.New(mysql.Config{
+	// 	Conn: sqlDB,
+	// }), &gorm.Config{})
+	return db, err
 }
 
 func cleanup() {
