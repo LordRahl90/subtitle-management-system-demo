@@ -29,6 +29,12 @@ func (s *Server) createSubtitle(ctx *gin.Context) {
 	created(ctx, res)
 }
 
+// takes in an array of subtitle files and generates subtitle files in the target language
+// security:
+// it's an authenticated endpoint
+// it's subject to cors preview
+// there is upload limit
+// there should also be a check on the type of file that was uploaded
 func (s *Server) uploadSubtitles(ctx *gin.Context) {
 	form, err := ctx.MultipartForm()
 	if err != nil {
@@ -51,10 +57,7 @@ func (s *Server) uploadSubtitles(ctx *gin.Context) {
 		return
 	}
 
-	println("res id: ", res.ID)
-
 	for _, file := range files {
-		println(file.Filename)
 		res, err := s.subtitleService.Upload(ctx.Request.Context(), res.ID, sourceLang, targetLang, file)
 		if err != nil {
 			internalError(ctx, err)

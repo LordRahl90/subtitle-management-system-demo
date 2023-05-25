@@ -80,13 +80,14 @@ func (ss *SubtitleService) Create(ctx context.Context, e *requests.Subtitle) (re
 // reads the lines
 // parses the lines and extract contents
 // generates a translation and writes it to a file
+// returns the file name to the calling method
 func (ss *SubtitleService) Upload(ctx context.Context, subtitleID, sourceLanguage, targetLanguage string, file *multipart.FileHeader) (string, error) {
 	f, err := file.Open()
 	if err != nil {
 		return "", nil
 	}
 	defer f.Close()
-	outputPath := "./outputs/" + primitive.NewObjectID().Hex() + ".txt"
+	outputPath := "./outputs/" + file.Filename + "-" + primitive.NewObjectID().Hex() + ".txt"
 	if _, err := os.Stat(outputPath); os.IsNotExist(err) {
 		if err := os.MkdirAll(filepath.Dir(outputPath), 0700); err != nil {
 			return "", err
