@@ -71,6 +71,7 @@ func setupTestDB() (*gorm.DB, error) {
 		panic(err)
 	}
 	sqlDB.SetConnMaxLifetime(0)
+	sqlDB.SetMaxIdleConns(0)
 	gormDB, err := gorm.Open(mysql.New(mysql.Config{
 		Conn: sqlDB,
 	}), &gorm.Config{})
