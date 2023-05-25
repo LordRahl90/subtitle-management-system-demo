@@ -37,17 +37,12 @@ func TestMain(m *testing.M) {
 	}()
 	db, initErr = setupTestDB()
 	if initErr != nil {
-		panic(initErr)
-		// log.Fatal(initErr)
-	}
-	if db == nil {
-		panic("db failed to initialize")
+		log.Fatal(initErr)
 	}
 
 	s, err := New(db)
 	if err != nil {
-		panic(err)
-		//log.Fatal(err)
+		log.Fatal(err)
 	}
 	server = s
 	server.signingSecret = signingSecret
@@ -65,29 +60,15 @@ func setupTestDB() (*gorm.DB, error) {
 	if err != nil {
 		panic(err)
 	}
-	// sqlDB, err := sql.Open("mysql", dsn)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// sqlDB.SetConnMaxLifetime(0)
-	// sqlDB.SetMaxIdleConns(0)
-	// gormDB, err := gorm.Open(mysql.New(mysql.Config{
-	// 	Conn: sqlDB,
-	// }), &gorm.Config{})
 	return db, err
 }
 
 func cleanup() {
-	if db == nil {
-		panic("DB is not initialized!!!")
-	}
 	if err := db.Exec("DELETE FROM users").Error; err != nil {
-		panic(err)
-		// log.Fatal(err)
+		log.Fatal(err)
 	}
 	if err := db.Exec("DELETE FROM translations").Error; err != nil {
-		panic(err)
-		// log.Fatal(err)
+		log.Fatal(err)
 	}
 }
 

@@ -2,6 +2,7 @@ package sts
 
 import (
 	"context"
+	"log"
 	"os"
 	"strings"
 	"testing"
@@ -21,16 +22,12 @@ var (
 func TestMain(m *testing.M) {
 	code := 1
 	defer func() {
-		// cleanup()
+		cleanup()
 		os.Exit(code)
 	}()
 	db, initError = setupTestDB()
 	if initError != nil {
-		panic(initError)
-		// log.Fatal(initError)
-	}
-	if db == nil {
-		panic("DB is not well setup!!!")
+		log.Fatal(initError)
 	}
 	code = m.Run()
 }
@@ -148,12 +145,12 @@ func setupTestDB() (*gorm.DB, error) {
 	return gorm.Open(mysql.Open(dsn), &gorm.Config{})
 }
 
-// func cleanup() {
-// 	if err := db.Exec("DELETE FROM contents").Error; err != nil {
-// 		log.Fatal(err)
-// 	}
+func cleanup() {
+	if err := db.Exec("DELETE FROM contents").Error; err != nil {
+		log.Fatal(err)
+	}
 
-// 	if err := db.Exec("DELETE FROM subtitles").Error; err != nil {
-// 		log.Fatal(err)
-// 	}
-// }
+	if err := db.Exec("DELETE FROM subtitles").Error; err != nil {
+		log.Fatal(err)
+	}
+}
