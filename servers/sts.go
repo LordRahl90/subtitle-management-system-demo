@@ -40,8 +40,26 @@ func (s *Server) uploadSubtitles(ctx *gin.Context) {
 	targetLang := ctx.PostForm("target_language")
 	files := form.File["files"]
 
+	subtitle := requests.Subtitle{
+		Name:           name,
+		SourceLanguage: sourceLang,
+		TargetLanguage: targetLang,
+	}
+	res, err := s.subtitleService.Create(ctx, &subtitle)
+	if err != nil {
+		internalError(ctx, err)
+		return
+	}
+
+	println("res id: ", res.ID)
+
 	for _, file := range files {
 		println(file.Filename)
+		res, err := s.subtitleService.Upload(ctx.Request.Context(), res.ID, sourceLang, targetLang, file)
+		if err != nil {
+			internalError(ctx, err)
+		}
+		println("output file: ", res)
 	}
 
 	println("Length: ", len(files))
@@ -49,5 +67,8 @@ func (s *Server) uploadSubtitles(ctx *gin.Context) {
 
 	ctx.Header("Content-Disposition", "attachment;filename=hello.txt")
 	ctx.Header("Content-Type", "application/text/plain")
-	ctx.Writer.Write([]byte("hello hello world"))
+	if _, err := ctx.Writer.Write([]byte("hello hello world")); err != nil {
+		internalError(ctx, err)
+		return
+	}
 }

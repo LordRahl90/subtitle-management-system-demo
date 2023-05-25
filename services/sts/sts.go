@@ -1,6 +1,7 @@
 package sts
 
 import (
+	"bufio"
 	"context"
 	"mime/multipart"
 
@@ -74,15 +75,26 @@ func (ss *SubtitleService) Create(ctx context.Context, e *requests.Subtitle) (re
 // reads the lines
 // parses the lines and extract contents
 // generates a translation and writes it to a file
-func (ss *SubtitleService) Upload(ctx context.Context, sourceLanguage string, file *multipart.FileHeader) (string, error) {
+func (ss *SubtitleService) Upload(ctx context.Context, subtitleID, sourceLanguage, targetLanguage string, file *multipart.FileHeader) (string, error) {
 	f, err := file.Open()
 	if err != nil {
 		return "", nil
 	}
 	defer f.Close()
+	scanner := bufio.NewScanner(f)
+	scanner.Split(bufio.ScanLines)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		println(line)
+	}
 
 	return "", nil
 }
+
+// func parseLines(ctx context.Context, line, subtitleID, sourceLanguage, targetLanguage string) *sts.Content {
+// 	return nil
+// }
 
 // NewWithDefault return a subtitle service with default connection
 func NewWithDefault(db *gorm.DB) (Service, error) {
