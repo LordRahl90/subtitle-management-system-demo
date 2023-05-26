@@ -97,8 +97,8 @@ func (ss *SubtitleService) Upload(ctx context.Context, outputDirectory, subtitle
 		}
 	}
 
-	// to optimize and also to build a cloud native solution,
-	// this file should be uploaded to a cloud storage and the path
+	// To optimize and also to build a cloud native solution,
+	// these files should be uploaded to a cloud storage and the path
 	// sent to the client.
 	// This way, the pods can die gracefully without having to lose any(much) file(s) in transit.
 	outputFile, err := os.Create(outputPath)

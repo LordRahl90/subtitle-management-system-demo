@@ -8,6 +8,7 @@ import (
 	"errors"
 	"io"
 	"mime/multipart"
+
 	"translations/domains/tms"
 
 	"gorm.io/gorm"
@@ -42,7 +43,7 @@ func (ts *TranslationService) Create(ctx context.Context, e *tms.Translation) er
 	return ts.translationRepo.Create(ctx, e)
 }
 
-// Translate takes in the required data and translates it to the target language.
+// Translate takes in the required data and translates it to the target language based on historical data.
 // It returns the source string if the target isn't found
 func (ts *TranslationService) Translate(ctx context.Context, source, sourceLang, targetLang string) (string, error) {
 	res, err := ts.translationRepo.Find(ctx, sourceLang, targetLang, source)

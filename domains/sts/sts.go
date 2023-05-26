@@ -7,12 +7,12 @@ import (
 	"gorm.io/gorm"
 )
 
-// Subtitle contains the subtitle elements
+// Repository contains the database that will be used to interact with the entities
 type Repository struct {
 	db *gorm.DB
 }
 
-// New returns a new instance of
+// New returns a new instance of sts.Manager
 func New(db *gorm.DB) (Manager, error) {
 	if err := db.AutoMigrate(&Subtitle{}, &Content{}); err != nil {
 		return nil, err

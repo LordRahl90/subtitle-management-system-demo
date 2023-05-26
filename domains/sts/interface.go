@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-// Manager manages interface for
+// Manager manages interface for Subtitle Translations
 type Manager interface {
 	Create(ctx context.Context, s *Subtitle) error
 	CreateContent(ctx context.Context, c *Content) error

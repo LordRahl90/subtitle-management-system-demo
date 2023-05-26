@@ -10,7 +10,7 @@ type Subtitle struct {
 	Content        []Content `json:"content"`
 }
 
-// Content respoj se DTO for content
+// Content respose DTO for content
 type Content struct {
 	ID         string `json:"id"`
 	SubtitleID string `json:"subtitle_id"`

@@ -19,3 +19,5 @@ COPY --from=build /app/translations translations
 
 
 EXPOSE 8080
+
+ENTRYPOINT [ "./translations" ]

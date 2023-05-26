@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+
 	"translations/servers"
 
 	"github.com/joho/godotenv"

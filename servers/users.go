@@ -63,6 +63,7 @@ func (s *Server) createUser(ctx *gin.Context) {
 		Name:     user.Name,
 		Email:    user.Email,
 		Password: user.Password,
+		UserType: users.UserType(user.UserType),
 	}
 
 	if err := s.userService.Create(ctx.Request.Context(), dbUser); err != nil {
@@ -85,6 +86,7 @@ func (s *Server) createUser(ctx *gin.Context) {
 		Name:      dbUser.Name,
 		Email:     dbUser.Email,
 		Token:     token,
+		UserType:  string(dbUser.UserType),
 		CreatedAt: &dbUser.CreatedAt,
 	}
 	created(ctx, res)

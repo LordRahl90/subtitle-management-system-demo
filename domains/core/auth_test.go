@@ -21,7 +21,7 @@ func TestGenerateToken(t *testing.T) {
 	token, err := td.Generate(signingSecret)
 	require.NoError(t, err)
 	require.NotEmpty(t, token)
-	assert.Len(t, strings.Split(token, "."), 3) // token should always divided into 3 parts
+	assert.Len(t, strings.Split(token, "."), 3)
 }
 
 func TestDecodeToken(t *testing.T) {

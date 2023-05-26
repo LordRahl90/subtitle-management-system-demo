@@ -9,8 +9,7 @@ type User struct {
 	ID        string     `json:"id"`
 	Name      string     `json:"name"`
 	Email     string     `json:"email"`
-	Gender    string     `json:"gender"`
-	Age       uint16     `json:"age"`
+	UserType  string     `json:"user_type"`
 	Token     string     `json:"token"`
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 }

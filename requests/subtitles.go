@@ -21,7 +21,7 @@ type Content struct {
 // Search request DTO for search
 type Search struct {
 	Name           string   `json:"name"`
-	TimeRange      []string `json:"time_range"`
+	TimeRange      []string `json:"time_range,omitempty"`
 	Source         []string `json:"source,omitempty"`
 	SourceLanguage string   `json:"source_language,omitempty"`
 	TargetLanguage string   `json:"target_language,omitempty"`
