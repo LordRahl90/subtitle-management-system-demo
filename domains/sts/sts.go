@@ -22,20 +22,35 @@ func New(db *gorm.DB) (Manager, error) {
 	}, nil
 }
 
+// FindContentByWords finds content by the subtitle and the given words
+func (rp *Repository) FindContentBySentences(ctx context.Context, subtitleID string, words ...string) ([]Content, error) {
+	var result []Content
+	err := rp.db.WithContext(ctx).
+		Where("subtitle_id = ? AND content IN ?",
+			subtitleID, words).
+		Order("created_at ASC").
+		Find(&result).Error
+	return result, err
+}
+
 // FindContentByTimestamp finds a subtitle content by the name and timerange
 func (rp *Repository) FindContentByTimeRange(ctx context.Context, subtitleID string, timerange ...string) ([]Content, error) {
 	var result []Content
 	err := rp.db.WithContext(ctx).
 		Where("subtitle_id = ? AND time_range IN ?",
 			subtitleID, timerange).
+		Order("created_at ASC").
 		Find(&result).Error
 	return result, err
 }
 
 // FindSubtitle finds a subtitle with the subtitle's name
-func (rp *Repository) FindSubtitle(ctx context.Context, name string) (*Subtitle, error) {
+func (rp *Repository) FindSubtitle(ctx context.Context, name, sourceLanguage string) (*Subtitle, error) {
 	var result *Subtitle
-	err := rp.db.WithContext(ctx).Where("name = ?", name).First(&result).Error
+	err := rp.db.
+		WithContext(ctx).
+		Where("name = ? AND source_language = ?", name, sourceLanguage).
+		First(&result).Error
 	return result, err
 }
 

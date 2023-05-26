@@ -14,6 +14,7 @@ type Subtitle struct {
 type Content struct {
 	ID         string `json:"id"`
 	SubtitleID string `json:"subtitle_id"`
+	ContenSeq  string `json:"sequence"`
 	TimeRange  string `json:"time_range"`
 	Content    string `json:"content"`
 }

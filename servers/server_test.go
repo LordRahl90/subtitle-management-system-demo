@@ -2,6 +2,7 @@ package servers
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -65,6 +66,14 @@ func cleanup() {
 	if err := db.Exec("DELETE FROM translations").Error; err != nil {
 		log.Fatal(err)
 	}
+
+	if err := db.Exec("DELETE FROM contents").Error; err != nil {
+		log.Fatal(err)
+	}
+
+	if err := db.Exec("DELETE FROM subtitles").Error; err != nil {
+		log.Fatal(err)
+	}
 }
 
 func requestHelper(t *testing.T, method, path, token string, payload []byte) *httptest.ResponseRecorder {
@@ -78,16 +87,19 @@ func requestHelper(t *testing.T, method, path, token string, payload []byte) *ht
 	if len(payload) == 0 {
 		req, err = http.NewRequest(method, path, nil)
 	} else {
+		fmt.Printf("\n\nReq: %s\n\n", payload)
 		req, err = http.NewRequest(method, path, bytes.NewBuffer(payload))
 	}
 
 	require.NoError(t, err)
 	req.Header.Set("Content-Type", "application/json")
 	if token != "" {
+		fmt.Printf("\n\nToken: %s\n\n", token)
 		req.Header.Set("Authorization", "Bearer "+token)
 	}
 	server.Router.ServeHTTP(w, req)
 	require.NotNil(t, w)
+	fmt.Printf("\n\nResponse: %s\n\n", w.Body.String())
 	return w
 }
 

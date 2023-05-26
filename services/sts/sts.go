@@ -134,6 +134,78 @@ func (ss *SubtitleService) Upload(ctx context.Context, outputDirectory, subtitle
 	return fileName, nil
 }
 
+// FindContentBySentences find and translate contents by an array of sentences
+func (ss *SubtitleService) FindContentBySentences(ctx context.Context, e *requests.Search) (*responses.Subtitle, error) {
+	sub, err := ss.subtitleRepository.FindSubtitle(ctx, e.Name, e.SourceLanguage)
+	if err != nil {
+		return nil, err
+	}
+	res, err := ss.subtitleRepository.FindContentBySentences(ctx, sub.ID, e.Source...)
+	if err != nil {
+		return nil, err
+	}
+
+	result := &responses.Subtitle{
+		ID:             sub.ID,
+		Name:           sub.Name,
+		Filename:       sub.Filename,
+		SourceLanguage: e.SourceLanguage,
+		TargetLanguage: e.TargetLanguage,
+	}
+
+	for _, v := range res {
+		tr, err := ss.translationService.Translate(ctx, v.Content, e.SourceLanguage, e.TargetLanguage)
+		if err != nil {
+			return nil, err
+		}
+		result.Content = append(result.Content, responses.Content{
+			ID:         v.ID,
+			ContenSeq:  v.ContentSeq,
+			SubtitleID: sub.ID,
+			TimeRange:  v.TimeRange,
+			Content:    tr,
+		})
+	}
+
+	return result, nil
+}
+
+// FindContentByTimeRange find and translate contents by an array of timestamos
+func (ss *SubtitleService) FindContentByTimeRange(ctx context.Context, e *requests.Search) (*responses.Subtitle, error) {
+	sub, err := ss.subtitleRepository.FindSubtitle(ctx, e.Name, e.SourceLanguage)
+	if err != nil {
+		return nil, err
+	}
+	res, err := ss.subtitleRepository.FindContentByTimeRange(ctx, sub.ID, e.TimeRange...)
+	if err != nil {
+		return nil, err
+	}
+
+	result := &responses.Subtitle{
+		ID:             sub.ID,
+		Name:           sub.Name,
+		Filename:       sub.Filename,
+		SourceLanguage: e.SourceLanguage,
+		TargetLanguage: e.TargetLanguage,
+	}
+
+	for _, v := range res {
+		tr, err := ss.translationService.Translate(ctx, v.Content, e.SourceLanguage, e.TargetLanguage)
+		if err != nil {
+			return nil, err
+		}
+		result.Content = append(result.Content, responses.Content{
+			ID:         v.ID,
+			ContenSeq:  v.ContentSeq,
+			SubtitleID: sub.ID,
+			TimeRange:  v.TimeRange,
+			Content:    tr,
+		})
+	}
+
+	return result, nil
+}
+
 func parseLine(ctx context.Context, line, subtitleID string) *sts.Content {
 	if line == "" {
 		return nil

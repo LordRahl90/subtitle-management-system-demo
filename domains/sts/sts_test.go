@@ -56,7 +56,7 @@ func TestCreateSubtitle(t *testing.T) {
 		}
 	})
 
-	res, err := repo.FindSubtitle(ctx, s.Name)
+	res, err := repo.FindSubtitle(ctx, s.Name, s.SourceLanguage)
 	require.NoError(t, err)
 	require.NotEmpty(t, res)
 
@@ -124,6 +124,54 @@ func TestFindContentByTimestamp(t *testing.T) {
 	}
 
 	res, err := repo.FindContentByTimeRange(ctx, subtitleID, "00:03:55.00 - 00:04:20.00", "00:04:59.00 - 00:05:30.00")
+	require.NoError(t, err)
+	require.NotNil(t, res)
+
+	assert.Len(t, res, 2)
+}
+
+func TestFindContentBySentences(t *testing.T) {
+	subtitleID := uuid.NewString()
+	ctx := context.Background()
+	ids := []string{}
+
+	repo, err := New(db)
+	require.NoError(t, err)
+	require.NotNil(t, repo)
+
+	c := []*Content{
+		{
+			SubtitleID: subtitleID,
+			TimeRange:  "00:01:20.00 - 00:02:00.00",
+			Content:    "Ich bin Arwen - Ich bin gekommen, um dir zu helfen.",
+		},
+		{
+			SubtitleID: subtitleID,
+			TimeRange:  "00:03:55.00 - 00:04:20.00",
+			Content:    "Komm zurück zum Licht.",
+		}, {
+			SubtitleID: subtitleID,
+			TimeRange:  "00:04:59.00 - 00:05:30.00",
+			Content:    "Nein, my Schatz!!.",
+		},
+	}
+
+	t.Cleanup(func() {
+		if err := db.Exec("DELETE FROM contents WHERE id IN ?", ids).Error; err != nil {
+			log.Fatal(err)
+		}
+	})
+
+	for _, v := range c {
+		require.NoError(t, repo.CreateContent(ctx, v))
+		ids = append(ids, v.ID)
+	}
+
+	res, err := repo.FindContentBySentences(ctx,
+		subtitleID,
+		"Komm zurück zum Licht.",
+		"Nein, my Schatz!!.",
+		"Hello World!")
 	require.NoError(t, err)
 	require.NotNil(t, res)
 

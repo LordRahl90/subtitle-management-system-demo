@@ -49,6 +49,7 @@ func New(db *gorm.DB, signingSecret, outputDirectory string) (*Server, error) {
 		signingSecret:    signingSecret,
 		outputDirectory:  outputDirectory,
 	}
+
 	s.Router.Use(s.authenticated())
 	s.Router.POST("/login", s.authenticate)
 	s.Router.POST("/users/create", s.createUser)

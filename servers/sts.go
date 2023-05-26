@@ -1,11 +1,14 @@
 package servers
 
 import (
+	"errors"
 	"fmt"
 	"os"
+
 	"translations/requests"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func (s *Server) stsRoutes() {
@@ -14,7 +17,49 @@ func (s *Server) stsRoutes() {
 		stsRoute.POST("", s.createSubtitle)
 		stsRoute.POST("upload", s.uploadSubtitles)
 		stsRoute.GET("download/:filename", s.downloadFile)
+		stsRoute.POST("search/words", s.searchByWords)
+		stsRoute.POST("search/time-range", s.searchByTimeRange)
 	}
+}
+
+func (s *Server) searchByWords(ctx *gin.Context) {
+	var req requests.Search
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		badRequestFromError(ctx, err)
+		return
+	}
+
+	res, err := s.subtitleService.FindContentBySentences(ctx, &req)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			notFound(ctx, "records not found")
+			return
+		}
+		internalError(ctx, err)
+		return
+	}
+
+	success(ctx, res)
+}
+
+func (s *Server) searchByTimeRange(ctx *gin.Context) {
+	var req requests.Search
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		badRequestFromError(ctx, err)
+		return
+	}
+
+	res, err := s.subtitleService.FindContentByTimeRange(ctx, &req)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			notFound(ctx, "records not found")
+			return
+		}
+		internalError(ctx, err)
+		return
+	}
+
+	success(ctx, res)
 }
 
 func (s *Server) createSubtitle(ctx *gin.Context) {
@@ -32,8 +77,8 @@ func (s *Server) createSubtitle(ctx *gin.Context) {
 	created(ctx, res)
 }
 
-// takes in an array of subtitle files and generates subtitle files in the target language
-// security:
+// Takes in an array of subtitle files and generates subtitle files in the target language
+// Security considerations:
 // it's an authenticated endpoint
 // it's subject to cors preview
 // there is upload limit
