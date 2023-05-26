@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -30,8 +29,6 @@ func TestCreateTranslation(t *testing.T) {
 	b, err := json.Marshal(req)
 	require.NoError(t, err)
 	require.NotEmpty(t, b)
-
-	fmt.Printf("\n\nReq: %s\n\nToken: %s\n\n", b, token)
 
 	res := requestHelper(t, http.MethodPost, "/tms", token, b)
 	require.Equal(t, http.StatusCreated, res.Code)
